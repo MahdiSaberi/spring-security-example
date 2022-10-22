@@ -22,9 +22,11 @@ public class DetailConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         InMemoryUserDetailsManager userDetailsManager = new InMemoryUserDetailsManager();
-        UserDetails userDetails = User.withUsername("admin").password("123").authorities("read").build();
+        UserDetails admin = User.withUsername("admin").password("admin").authorities("read").build();
+        UserDetails ordinary = User.withUsername("mahdi").password("123").authorities("write","read").build();
 
-        userDetailsManager.createUser(userDetails);
+        userDetailsManager.createUser(admin);
+        userDetailsManager.createUser(ordinary);
 
         auth.userDetailsService(userDetailsManager).passwordEncoder(NoOpPasswordEncoder.getInstance());
 
@@ -32,7 +34,9 @@ public class DetailConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated();
+
+//        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().hasAuthority("read");
         http.formLogin();
         http.httpBasic();
     }
